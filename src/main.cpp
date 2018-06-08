@@ -1,10 +1,6 @@
 #include "Lexer.h"
 #include "Parser.h"
-#include <functional>
 
-void f(int &a, ...) {
-	cout << a << endl;
-}
 
 int main(int argc, char *argv[]) {
 	if(argc != 2) {
@@ -17,6 +13,7 @@ int main(int argc, char *argv[]) {
 	lexer.printTokenList();
 
 	Parser parser;
+
 /*
 	parser.printFirstSet();
 	parser.printFollowSet();
@@ -26,20 +23,20 @@ int main(int argc, char *argv[]) {
 	
 	if(parser.analyze(tokenList)) {
 		cout << "Perfect!!\n";
+
+		printVarList();
+		printIDList();
+		printQuadList();
+
+		run();
+
+		printVarList();
+		printIDList();
+		printQuadList();
+
 	} else {
 		cout << "QAQ!!\n";
 	}
-
-	printVarList();
-	printIDList();
-	printQuadList();
-
-	run();
-
-
-	printVarList();
-	printIDList();
-	printQuadList();
 
 	return 0;
 }

@@ -14,6 +14,10 @@ const vector<SyntaxItem> Parser::Syntax = {
     SyntaxItem(s_lines, {s_line}),                  // lines -> line
     SyntaxItem(s_line, {s_exp, l_semicolon}),       // line  -> expression;
     SyntaxItem(s_line, {s_declare, l_semicolon}),   // line  -> declare;
+    SyntaxItem(s_line, {s_assignment, l_semicolon}),
+    SyntaxItem(s_line, {s_output, l_semicolon}),
+    SyntaxItem(s_line, {s_ifstatement}),
+    SyntaxItem(s_line, {s_whilestatement}),
     
     // expression
     SyntaxItem(s_exp, {s_exp, l_add, s_times},      // expression -> epsression + times
@@ -59,6 +63,18 @@ const vector<SyntaxItem> Parser::Syntax = {
             else T.type = exp_int;
             T.place = newtemp(T.type);
             quadList.push_back({op_mul, T1.place, F.place, T.place}); // emit
+            return T;
+        }
+    ),
+    SyntaxItem(s_times, {s_times, l_div, s_factor}, // times -> times * factor
+        OPERATION {
+            int top = stk.size() - 1;
+            Tuple T;
+            const Tuple &T1 = stk[top-2], &F = stk[top];
+            if(T1.type == exp_float || F.type == exp_float) T.type = exp_float;
+            else T.type = exp_int;
+            T.place = newtemp(T.type);
+            quadList.push_back({op_div, T1.place, F.place, T.place}); // emit
             return T;
         }
     ),
@@ -207,9 +223,90 @@ const vector<SyntaxItem> Parser::Syntax = {
             T.type = exp_float;
             return T;
         }
-    )
-};
+    ),
 
+    SyntaxItem(s_assignment, {l_id, l_assign, s_exp}, 
+        OPERATION {
+            int top = stk.size() - 1;
+            int index = find(IDlist.begin(), IDlist.end(), Identifier(stk[top-2].name)) - IDlist.begin();
+            if(index == IDlist.size()) {
+                // error
+                cout << "error!!!\n";
+                exit(-1);
+            }
+            quadList.push_back({op_assign, stk[top].place, -1, IDlist[index].place});
+            return Tuple();
+        }
+    ),
+
+    SyntaxItem(s_output, {l_print, l_open_paren, s_exp, l_close_paren},
+        OPERATION {
+            int top = stk.size() - 1;
+            quadList.push_back({op_output, stk[top-1].place, -1, -1});
+            return Tuple();
+        }
+    ),
+
+    // if statement
+    SyntaxItem(s_ifstatement, {s_ifcondition, s_block}, 
+        OPERATION {
+            int top = stk.size() - 1;
+            const Tuple &C = stk[top-1];
+            quadList[C.addr].result = quadList.size();
+            return Tuple();
+        }
+    ),
+    SyntaxItem(s_ifstatement, {s_elsecondition, s_block}, 
+        OPERATION {
+            int top = stk.size() - 1;
+            const Tuple &E = stk[top-1];
+            quadList[E.addr].result = quadList.size();
+            return Tuple();
+        }
+    ),
+    SyntaxItem(s_ifcondition, {l_if, l_open_paren, s_exp, l_close_paren},
+        OPERATION {
+            int top = stk.size() - 1;
+            Tuple C;
+            C.addr = quadList.size();
+            quadList.push_back({op_jz, stk[top - 1].place, -1, -1});
+            return C;
+        }
+    ),
+    SyntaxItem(s_elsecondition, {s_ifcondition, s_block, l_else}, 
+        OPERATION {
+            int top = stk.size() - 1;
+            const Tuple &C = stk[top-2];
+            quadList[C.addr].result = quadList.size();
+            Tuple E;
+            E.addr = quadList.size();
+            quadList.push_back({op_j, -1, -1, -1});
+            return E;
+        }
+    ),
+
+    SyntaxItem(s_whilestatement, {s_whilecondition, s_block}, 
+        OPERATION {
+            int top = stk.size() - 1;
+            const Tuple &C = stk[top-1];
+            quadList.push_back({op_j, -1, -1, C.addr});
+            quadList[C.addr].result = quadList.size();
+            return Tuple();
+        }
+    ),
+    SyntaxItem(s_whilecondition, {l_while, l_open_paren, s_exp, l_close_paren},
+        OPERATION {
+            int top = stk.size() - 1;
+            Tuple C;
+            C.addr = quadList.size();
+            quadList.push_back({op_jz, stk[top - 1].place, -1, -1});
+            return C;
+        }
+    ),
+
+    SyntaxItem(s_block, {s_line}),
+    SyntaxItem(s_block, {l_open_brace, s_lines, l_close_brace})
+};
 
 Parser::Parser() {
     generateTable();

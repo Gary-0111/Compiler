@@ -14,6 +14,7 @@ enum SyntaxSymbol {
     l_else,
     l_for,
     l_while,
+    l_print,
     l_return,
     // identifier
     l_id,
@@ -52,8 +53,16 @@ enum SyntaxSymbol {
     s_times,
     s_factor,
     s_declare,
+    s_assignment,
+    s_output,
     s_idtype,
     s_idList,
+    s_ifstatement,
+    s_ifcondition,
+    s_elsecondition,
+    s_whilestatement,
+    s_whilecondition,
+    s_block,
 
     s_dot               // 
 };
@@ -135,6 +144,7 @@ struct Tuple {
     char name[32];
     int state;
     int place;
+    int addr;
 };
 
 

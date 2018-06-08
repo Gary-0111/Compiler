@@ -8,6 +8,7 @@ const std::map<std::string, SyntaxSymbol> Lexer::keyword = {
 	{"else",   l_else   },
 	{"for",    l_for    },
 	{"while",  l_while  },
+	{"print",  l_print  },
 	{"return", l_return }
 };
 

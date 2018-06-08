@@ -9,8 +9,6 @@
 #include <string>
 #include "Token.h"
 
-
-
 class Lexer {
 	public:
 		Lexer();

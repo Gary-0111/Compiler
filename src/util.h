@@ -11,6 +11,9 @@ enum Operator {
     op_add,
     op_sub,
     op_mul,
+    op_div,
+    op_assign,
+    op_output,
     op_j,
     op_jz
 };
@@ -34,6 +37,11 @@ void printQuadList();
 void run();
 void add(int arg1, int arg2, int res);
 void sub(int arg1, int arg2, int res);
-
+void mul(int arg1, int arg2, int res);
+void div(int arg1, int arg2, int res);
+void assign(int arg1, int res);
+void output(int arg1);
+void jump(int res, int &pc);
+void jump_zero(int arg1, int res, int &pc);
 
 #endif

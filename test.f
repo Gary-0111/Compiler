@@ -1,2 +1,5 @@
-int a = 9, b = 1;
-float c = a+b, d = a+b+c;
+int n = 10;
+while(n) {
+    print(n);
+    n = n - 1;
+}
