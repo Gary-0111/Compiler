@@ -1,5 +1,9 @@
-int n = 10;
-while(n) {
-    print(n);
-    n = n - 1;
+int a = 0;
+if(a) {
+    a = a-a;
+    print(a);
+
+} else {
+    a = a+100;
+    print(a);
 }

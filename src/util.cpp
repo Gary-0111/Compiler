@@ -1,5 +1,8 @@
 #include "util.h"
 
+vector<Identifier> IDlist;
+vector<variable> varList;
+vector<Quadruple> quadList;
 
 void printIDList() {
 	std::cout << "################ Identifier List ##################\n";

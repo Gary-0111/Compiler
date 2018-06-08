@@ -1,6 +1,6 @@
 #include "Lexer.h"
 #include "Parser.h"
-
+#include <sys/time.h>
 
 int main(int argc, char *argv[]) {
 	if(argc != 2) {
@@ -12,15 +12,17 @@ int main(int argc, char *argv[]) {
 	std::vector<Token>& tokenList = lexer.analyze(argv[1]);
 	lexer.printTokenList();
 
+	struct timeval start, end;
+	gettimeofday(&start, NULL);
+	double ts = (double)start.tv_sec*1000 + start.tv_usec/1000;
+
 	Parser parser;
 
-/*
-	parser.printFirstSet();
-	parser.printFollowSet();
-	parser.printTable();
-	//parser.printItemSet();
-*/
-	
+	gettimeofday(&end, NULL);
+	double te = (double)end.tv_sec*1000 + end.tv_usec/1000;	
+
+	std::cout << "Initial the parser cost: " << (te-ts) << "ms\n";
+
 	if(parser.analyze(tokenList)) {
 		cout << "Perfect!!\n";
 

@@ -7,7 +7,7 @@
 #include <cctype>
 #include <map>
 #include <string>
-#include "Token.h"
+#include "util.h"
 
 class Lexer {
 	public:
