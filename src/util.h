@@ -32,6 +32,7 @@ enum SyntaxSymbol {
     l_sub,              // -
     l_mul,              // *
     l_div,              // /
+    l_mod,              // %
     l_equal,            // ==
     l_not_equal,        // !=
     l_less,             // <
@@ -67,6 +68,8 @@ enum SyntaxSymbol {
     s_elsecondition,
     s_whilestatement,
     s_whilecondition,
+    s_while,
+    s_rop,
     s_block,
 
     s_dot               // 
@@ -84,13 +87,28 @@ enum Operator {
     op_sub,
     op_mul,
     op_div,
+    op_mod,
     op_assign,
     op_output,
     op_j,
-    op_jz
+    op_jz,
+    op_eq,
+    op_ne,
+    op_g,
+    op_ge,
+    op_l,
+    op_le
 };
 
 union expValue {
+    /*
+    bool operator == (const expValue &a) const {
+        return integer == a.integer;
+    }
+    bool operator != (const expValue &a) const {
+        return integer != a.integer;
+    }
+    */
     int integer;
     float decimal;
 };
@@ -157,10 +175,12 @@ struct Tuple {
 
     SyntaxSymbol symbol;
     expType type;
+    Operator op;
     char name[32];
     int state;
     int place;
     int addr;
+    int quad;  
 };
 
 struct Quadruple {
@@ -182,10 +202,18 @@ void add(int arg1, int arg2, int res);
 void sub(int arg1, int arg2, int res);
 void mul(int arg1, int arg2, int res);
 void div(int arg1, int arg2, int res);
+void mod(int arg1, int arg2, int res);
+
 void assign(int arg1, int res);
 void output(int arg1);
 void jump(int res, int &pc);
-void jump_zero(int arg1, int res, int &pc);
+void jump_z(int arg1, int res, int &pc);
 
+void eq(int arg1, int arg2, int res);
+void neq(int arg1, int arg2, int res);
+void gt(int arg1, int arg2, int res);
+void gteq(int arg1, int arg2, int res);
+void ls(int arg1, int arg2, int res);
+void lseq(int arg1, int arg2, int res);
 
 #endif

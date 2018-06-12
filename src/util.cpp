@@ -43,6 +43,7 @@ void run() {
 	int pc = 0;
 	std::cout << "********* Start ***********\n";
 	while(pc >= 0 && pc < quadList.size()) {
+		//cout << "PC: " << pc << "\n";
 		const Quadruple &quad = quadList[pc];
 		switch(quad.op) 
 		{
@@ -50,10 +51,17 @@ void run() {
 			case op_sub: sub(quad.arg1, quad.arg2, quad.result); break;
 			case op_mul: mul(quad.arg1, quad.arg2, quad.result); break;
 			case op_div: div(quad.arg1, quad.arg2, quad.result); break;
+			case op_mod: mod(quad.arg1, quad.arg2, quad.result); break;
 			case op_assign: assign(quad.arg1, quad.result); break;
 			case op_output: output(quad.arg1); break;
 			case op_j:   jump(quad.result, pc); break;
-			case op_jz:  jump_zero(quad.arg1, quad.result, pc); break;
+			case op_jz:  jump_z(quad.arg1, quad.result, pc); 	   break;
+			case op_eq:  eq(quad.arg1, quad.arg2, quad.result);    break;
+			case op_ne:  neq(quad.arg1, quad.arg2, quad.result);   break;
+    		case op_g:   gt(quad.arg1, quad.arg2, quad.result);    break;
+    		case op_ge:  gteq(quad.arg1, quad.arg2, quad.result);  break;
+    		case op_l:   ls(quad.arg1, quad.arg2, quad.result);    break;
+    		case op_le:  lseq(quad.arg1, quad.arg2, quad.result);  break;
 			default:     break;
 		}
 		++pc;
@@ -106,6 +114,19 @@ void div(int arg1, int arg2, int res) {
 	}
 }
 
+void mod(int arg1, int arg2, int res) {
+	variable &a = varList[arg1], &b = varList[arg2], &result = varList[res];
+	if(a.type != exp_int || b.type != exp_int) {
+		// error
+		exit(-1);
+	}
+	if(result.type == exp_float) {
+		result.evalue.decimal = a.evalue.integer % b.evalue.integer;
+	} else {
+		result.evalue.integer = a.evalue.integer % b.evalue.integer;
+	}
+}
+
 void assign(int arg1, int res) {
 	variable &a = varList[arg1], &result = varList[res];
 	if(result.type == exp_float) {
@@ -128,9 +149,77 @@ void jump(int res, int &pc) {
 	pc = res - 1;
 }
 
-void jump_zero(int arg1, int res, int &pc) {
+void jump_z(int arg1, int res, int &pc) {
 	variable &a = varList[arg1];
 	if(a.evalue.integer == 0) {
 		pc = res - 1;
+	}
+}
+
+void eq(int arg1, int arg2, int res) {
+	variable &a = varList[arg1], &b = varList[arg2], &result = varList[res];
+	result.evalue.integer = 0;
+	if(a.type == exp_float || b.type == exp_float) {
+		if(a.tofloat() == b.tofloat())
+			result.evalue.integer = 1;
+	}
+	else if(a.evalue.integer == b.evalue.integer) {
+		result.evalue.integer = 1;
+	}
+}
+
+void neq(int arg1, int arg2, int res) {
+	variable &a = varList[arg1], &b = varList[arg2], &result = varList[res];
+	result.evalue.integer = 0;
+	if(a.type == exp_float || b.type == exp_float) {
+		if(a.tofloat() != b.tofloat())
+			result.evalue.integer = 1;
+	}
+	else if(a.evalue.integer != b.evalue.integer) {
+		result.evalue.integer = 1;
+	}
+}
+void gt(int arg1, int arg2, int res) {
+	variable &a = varList[arg1], &b = varList[arg2], &result = varList[res];
+	result.evalue.integer = 0;
+	if(a.type == exp_float || b.type == exp_float) {
+		if(a.tofloat() > b.tofloat())
+			result.evalue.integer = 1;
+	}
+	else if(a.evalue.integer > b.evalue.integer) {
+		result.evalue.integer = 1;
+	}
+}
+void gteq(int arg1, int arg2, int res) {
+	variable &a = varList[arg1], &b = varList[arg2], &result = varList[res];
+	result.evalue.integer = 0;
+	if(a.type == exp_float || b.type == exp_float) {
+		if(a.tofloat() >= b.tofloat())
+			result.evalue.integer = 1;
+	}
+	else if(a.evalue.integer >= b.evalue.integer) {
+		result.evalue.integer = 1;
+	}
+}
+void ls(int arg1, int arg2, int res) {
+	variable &a = varList[arg1], &b = varList[arg2], &result = varList[res];
+	result.evalue.integer = 0;
+	if(a.type == exp_float || b.type == exp_float) {
+		if(a.tofloat() < b.tofloat())
+			result.evalue.integer = 1;
+	}
+	else if(a.evalue.integer < b.evalue.integer) {
+		result.evalue.integer = 1;
+	}
+}
+void lseq(int arg1, int arg2, int res) {
+	variable &a = varList[arg1], &b = varList[arg2], &result = varList[res];
+	result.evalue.integer = 0;
+	if(a.type == exp_float || b.type == exp_float) {
+		if(a.tofloat() <= b.tofloat())
+			result.evalue.integer = 1;
+	}
+	else if(a.evalue.integer <= b.evalue.integer) {
+		result.evalue.integer = 1;
 	}
 }

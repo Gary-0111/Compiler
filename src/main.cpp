@@ -7,6 +7,13 @@ int main(int argc, char *argv[]) {
 		printf("Usage:\n\t%s <inputfile>\n", argv[0]);
 		return -1;
 	}
+/*
+	vector<Tuple> stk;
+	for(int i = 0; i < 100; ++i) {
+		stk.push_back(Tuple());
+		cout << "what!!!!!    " << stk.size() << "\n";
+	}
+*/
 
 	Lexer lexer;
 	std::vector<Token>& tokenList = lexer.analyze(argv[1]);

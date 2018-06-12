@@ -95,7 +95,6 @@ const vector<SyntaxItem> Syntax = {
             return E;
         }
     ),
-    
     SyntaxItem(s_exp, {s_exp, l_sub, s_times},      // expression -> epsression + times
         OPERATION {
             int top = stk.size() - 1;
@@ -108,7 +107,6 @@ const vector<SyntaxItem> Syntax = {
             return E;
         }
     ),
-    
     SyntaxItem(s_exp, {s_times},                    // expression -> times
         OPERATION {
             Tuple E;
@@ -138,6 +136,21 @@ const vector<SyntaxItem> Syntax = {
             else T.type = exp_int;
             T.place = newtemp(T.type);
             quadList.push_back({op_div, T1.place, F.place, T.place}); // emit
+            return T;
+        }
+    ),
+    SyntaxItem(s_times, {s_times, l_mod, s_factor}, // times -> times * factor
+        OPERATION {
+            int top = stk.size() - 1;
+            Tuple T;
+            const Tuple &T1 = stk[top-2], &F = stk[top];
+            if(T1.type != exp_int || F.type != exp_int) {
+                // error
+                exit(-1);
+            }
+            T.type = exp_int;
+            T.place = newtemp(T.type);
+            quadList.push_back({op_mod, T1.place, F.place, T.place}); // emit
             return T;
         }
     ),
@@ -352,17 +365,79 @@ const vector<SyntaxItem> Syntax = {
         OPERATION {
             int top = stk.size() - 1;
             const Tuple &C = stk[top-1];
-            quadList.push_back({op_j, -1, -1, C.addr});
+            quadList.push_back({op_j, -1, -1, C.quad});
             quadList[C.addr].result = quadList.size();
             return Tuple();
         }
     ),
-    SyntaxItem(s_whilecondition, {l_while, l_open_paren, s_exp, l_close_paren},
+    SyntaxItem(s_whilecondition, {s_while, l_open_paren, s_exp, l_close_paren},
         OPERATION {
             int top = stk.size() - 1;
             Tuple C;
+            C.quad = stk[top - 3].quad;
             C.addr = quadList.size();
             quadList.push_back({op_jz, stk[top - 1].place, -1, -1});
+            return C;
+        }
+    ),
+    SyntaxItem(s_while, {l_while}, 
+        OPERATION {
+            Tuple W;
+            W.quad = quadList.size();
+            return W;
+        }
+    ),
+
+// TODO:
+    SyntaxItem(s_exp, {s_exp, s_rop, s_exp},
+        OPERATION {
+            int top = stk.size() - 1;
+            Tuple E;
+            E.type = exp_int;
+            E.place = newtemp(E.type);
+            quadList.push_back({stk[top-1].op, stk[top - 2].place, stk[top].place, E.place});
+            return E;
+        }
+    ),
+    SyntaxItem(s_rop, {l_equal},
+        OPERATION {
+            Tuple C;
+            C.op = op_eq;
+            return C;
+        }
+    ),
+    SyntaxItem(s_rop, {l_not_equal},
+        OPERATION {
+            Tuple C;
+            C.op = op_ne;
+            return C;
+        }
+    ),
+    SyntaxItem(s_rop, {l_greater},
+        OPERATION {
+            Tuple C;
+            C.op = op_g;
+            return C;
+        }
+    ),
+    SyntaxItem(s_rop, {l_greater_equal},
+        OPERATION {
+            Tuple C;
+            C.op = op_ge;
+            return C;
+        }
+    ),
+    SyntaxItem(s_rop, {l_less},
+        OPERATION {
+            Tuple C;
+            C.op = op_l;
+            return C;
+        }
+    ),
+    SyntaxItem(s_rop, {l_less_equal},
+        OPERATION {
+            Tuple C;
+            C.op = op_le;
             return C;
         }
     ),

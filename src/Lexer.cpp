@@ -71,6 +71,7 @@ std::vector<Token>& Lexer::analyze(const char *file) {
 						case '-': addToken(Token(l_sub,           getStr())); break;
 						case '*': addToken(Token(l_mul,           getStr())); break;
 						case '/': addToken(Token(l_div,           getStr())); break;
+						case '%': addToken(Token(l_mod,  		  getStr())); break;
 						case '(': addToken(Token(l_open_paren,    getStr())); break;
 						case ')': addToken(Token(l_close_paren,   getStr())); break;
 						case '[': addToken(Token(l_open_bracket,  getStr())); break;

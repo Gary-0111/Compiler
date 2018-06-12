@@ -28,8 +28,8 @@ Parser::~Parser() {
 // print the analyze process
 bool Parser::analyze(vector<Token> &line) {
     bool ret;
-    line.push_back(Token(l_eof, l_eof));
-    vector<Tuple> stk;
+    line.push_back(Token(l_eof, -1));
+    static vector<Tuple> stk;
     stk.push_back(Tuple(l_eof, 0));
 
     Token &token = line[0];
@@ -38,7 +38,9 @@ bool Parser::analyze(vector<Token> &line) {
     while(1) {
         int state = stk.back().state;
         const ActionItem &act = ACTION[state][symbol];
+        //cout << "ACTION[" << state << "][" << symbol << "] = {" << act.type << ", " << act.num << "}\n";
         if(act.type == Act_shift) {
+            //cout << "ACTION[" << state << "][" << symbol << "] = {shift, " << act.num << "}\n";
             if(symbol == l_integer || symbol == l_decimal) {
                 int place = newtemp(symbol == l_integer? exp_int : exp_float);
                 varList[place] = token.value.var;
@@ -50,7 +52,9 @@ bool Parser::analyze(vector<Token> &line) {
             }
             token = line[++index];
             symbol = token.symbol;
+
         } else if(act.type == Act_reduce) {
+            //cout << "ACTION[" << state << "][" << symbol << "] = {reduce, " << act.num << "}\n";
             int i = act.num;
             const auto &left = Syntax[i].rule.first;
             const auto &right = Syntax[i].rule.second;
